@@ -136,9 +136,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div style="text-align:center;color:#aaa;font-size:12px;margin-top:16px;">首次使用请先注册账号</div>
   <div class="qr-box">
     <div class="qr-title">📱 扫一扫打开小程序</div>
-    <img src="/qrcode.png" class="qr-img" alt="二维码">
+    <div id="qrCodeLogin" style="display:inline-block;"></div>
     <div class="qr-url" id="shareUrl"></div>
-    <div class="qr-tip">同一WiFi下扫码即可使用</div>
+    <div class="qr-tip">任何人扫码即可使用</div>
   </div>
 </div>
 
@@ -207,7 +207,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     </div>
     <div class="qr-box" style="margin-bottom:16px;">
       <div style="font-size:15px;font-weight:bold;margin-bottom:10px;">📱 邀请同学扫码加入</div>
-      <img src="/qrcode.png" style="width:180px;height:180px;border-radius:8px;" alt="二维码">
+      <div id="qrCodeMine" style="display:inline-block;"></div>
       <div style="font-size:11px;color:#888;margin-top:6px;" id="shareUrl2"></div>
     </div>
     <div style="font-size:16px;font-weight:bold;margin-bottom:12px;">我的发布</div>
@@ -235,6 +235,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
 // ============ 全局状态 ============
 const BASE = window.location.origin;
@@ -554,8 +555,12 @@ async function loadMine() {
 }
 
 // ============ 初始化 ============
-document.getElementById('shareUrl').textContent = window.location.href;
-document.getElementById('shareUrl2').textContent = window.location.href;
+const pageUrl = window.location.href;
+document.getElementById('shareUrl').textContent = pageUrl;
+document.getElementById('shareUrl2').textContent = pageUrl;
+// 动态生成二维码
+new QRCode(document.getElementById('qrCodeLogin'), { text: pageUrl, width:180, height:180, colorDark:'#1aad19', colorLight:'#ffffff' });
+new QRCode(document.getElementById('qrCodeMine'), { text: pageUrl, width:160, height:160, colorDark:'#1aad19', colorLight:'#ffffff' });
 if (token && userInfo) {
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('hidden');
