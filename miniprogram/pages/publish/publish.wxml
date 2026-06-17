@@ -1,0 +1,76 @@
+<view class="container">
+  <view class="card">
+    <!-- 标题 -->
+    <view class="form-group">
+      <view class="form-label">标题</view>
+      <input class="input" placeholder="输入标题..." value="{{title}}" bindinput="onTitleInput" />
+    </view>
+
+    <!-- 类型选择 -->
+    <view class="form-group">
+      <view class="form-label">类型</view>
+      <view class="option-row">
+        <view class="option {{type==='knowledge'?'active':''}}" bindtap="selectType" data-type="knowledge">
+          📖 知识点
+        </view>
+        <view class="option {{type==='homework'?'active':''}}" bindtap="selectType" data-type="homework">
+          📝 作业
+        </view>
+        <view class="option {{type==='discussion'?'active':''}}" bindtap="selectType" data-type="discussion">
+          💬 讨论
+        </view>
+      </view>
+    </view>
+
+    <!-- 正文 -->
+    <view class="form-group">
+      <view class="form-label">内容</view>
+      <textarea class="textarea" placeholder="分享你的想法..." value="{{content}}"
+                bindinput="onContentInput" auto-height maxlength="5000" />
+    </view>
+
+    <!-- 可见性 -->
+    <view class="form-group">
+      <view class="form-label">谁可以看</view>
+      <picker bindchange="onVisibilityChange" value="{{visibilityIndex}}" range="{{visibilityOptions}}">
+        <view class="picker">
+          {{visibilityOptions[visibilityIndex]}}
+          <text style="color:#ccc;float:right;">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 指定用户选择（仅 visibility='specific' 时显示） -->
+    <view wx:if="{{visibility==='specific'}}" class="form-group">
+      <view class="form-label">选择可见用户</view>
+      <view class="user-select-list">
+        <view class="user-checkbox" wx:for="{{users}}" wx:key="id"
+              wx:if="{{item.id !== userInfo.id}}">
+          <checkbox checked="{{util.arrayContains(visibleUsers, item.id)}}"
+                    bindtap="toggleUser" data-id="{{item.id}}" />
+          <text>{{item.username}} ({{util.roleLabel(item.role)}})</text>
+        </view>
+      </view>
+      <view wx:if="{{users.length <= 1}}" class="empty" style="padding:30rpx;">
+        暂无其他用户
+      </view>
+    </view>
+
+    <!-- 附件 -->
+    <view class="form-group">
+      <view class="form-label">附件（选填）</view>
+      <view wx:if="{{fileName}}" class="file-info">
+        📎 {{fileName}}
+        <text class="remove-file" bindtap="removeFile">✕</text>
+      </view>
+      <button class="btn-outline upload-btn" bindtap="chooseFile" wx:else>
+        + 选择文件
+      </button>
+    </view>
+  </view>
+
+  <!-- 提交 -->
+  <button class="btn-primary submit-btn" bindtap="handleSubmit" loading="{{loading}}">
+    发布
+  </button>
+</view>

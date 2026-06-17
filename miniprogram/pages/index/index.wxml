@@ -1,0 +1,57 @@
+<view class="container">
+  <!-- 顶部筛选 -->
+  <scroll-view class="filter-bar" scroll-x enable-flex>
+    <view class="filter-item {{activeType===''?'active':''}}" bindtap="switchType" data-type="">全部</view>
+    <view class="filter-item {{activeType==='knowledge'?'active':''}}" bindtap="switchType" data-type="knowledge">📖 知识点</view>
+    <view class="filter-item {{activeType==='homework'?'active':''}}" bindtap="switchType" data-type="homework">📝 作业</view>
+    <view class="filter-item {{activeType==='discussion'?'active':''}}" bindtap="switchType" data-type="discussion">💬 讨论</view>
+  </scroll-view>
+
+  <!-- 帖子列表 -->
+  <view wx:if="{{list.length > 0}}">
+    <view class="card post-item" wx:for="{{list}}" wx:key="id"
+          bindtap="goDetail" data-id="{{item.id}}">
+      <view class="post-header">
+        <view class="post-user">
+          <view class="avatar">{{item.role === 'teacher' ? '👨‍🏫' : '👨‍🎓'}}</view>
+          <view class="user-info">
+            <view class="user-name">
+              {{item.username}}
+              <text class="tag tag-{{item.role}}">{{item.role === 'teacher' ? '老师' : '学生'}}</text>
+            </view>
+            <view class="post-time">{{util.formatTime(item.created_at)}}</view>
+          </view>
+        </view>
+        <view class="tag tag-{{item.type}}">{{util.typeLabel(item.type)}}</view>
+      </view>
+
+      <view class="post-title">{{item.title}}</view>
+
+      <view wx:if="{{item.content}}" class="post-content ellipsis-2">{{item.content}}</view>
+
+      <view wx:if="{{item.file_name}}" class="post-file">
+        📎 {{item.file_name}}
+      </view>
+
+      <view class="post-footer">
+        <view class="visibility-tag">🔒 {{util.visibilityLabel(item.visibility)}}</view>
+        <view class="post-action" catchtap="deletePost" data-id="{{item.id}}" wx:if="{{item.user_id === userInfo.id}}">
+          🗑️
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view wx:if="{{loadingMore}}" class="loading-more">加载中...</view>
+  <view wx:if="{{noMore && list.length > 0}}" class="loading-more">没有更多了</view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{list.length === 0 && !loading}}">
+    <view class="empty">
+      <view class="icon">📭</view>
+      <view>暂无动态</view>
+      <view style="font-size:24rpx;margin-top:10rpx;">快去发布第一条内容吧~</view>
+    </view>
+  </view>
+</view>

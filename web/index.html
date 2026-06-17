@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电动汽车技术 - 课程平台</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; max-width: 500px; margin:0 auto; min-height:100vh; position:relative; }
+.hidden { display:none !important; }
+
+/* 登录页 */
+#loginPage { padding:60px 30px; text-align:center; min-height:100vh; background:linear-gradient(180deg, #e8f5e9 0%, #f5f5f5 50%); }
+#loginPage .logo { font-size:64px; margin-bottom:12px; }
+#loginPage .title { font-size:24px; font-weight:bold; color:#1aad19; margin-bottom:6px; }
+#loginPage .subtitle { font-size:14px; color:#888; margin-bottom:32px; }
+.tabs { display:flex; background:#fff; border-radius:12px; padding:4px; margin-bottom:24px; }
+.tab { flex:1; text-align:center; padding:12px; border-radius:10px; font-size:15px; color:#888; cursor:pointer; transition:all .2s; }
+.tab.active { background:#1aad19; color:#fff; font-weight:bold; }
+.form-box { background:#fff; border-radius:16px; padding:28px 20px; text-align:left; }
+.form-box input { width:100%; padding:14px 16px; margin-bottom:14px; background:#f5f5f5; border:none; border-radius:10px; font-size:15px; outline:none; }
+.role-row { display:flex; gap:12px; margin-bottom:14px; }
+.role-btn { flex:1; text-align:center; padding:14px; border:2px solid #e0e0e0; border-radius:10px; font-size:15px; cursor:pointer; }
+.role-btn.sel { border-color:#1aad19; background:#e8f5e9; color:#1aad19; font-weight:bold; }
+.btn { width:100%; padding:14px; background:linear-gradient(135deg,#1aad19,#0d8c0d); color:#fff; border:none; border-radius:10px; font-size:16px; cursor:pointer; }
+.btn:active { opacity:.85; }
+
+/* TabBar */
+#tabBar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:500px; display:flex; background:#fff; border-top:1px solid #eee; z-index:100; padding-bottom:env(safe-area-inset-bottom); }
+#tabBar .tb { flex:1; text-align:center; padding:10px 0 6px; font-size:12px; color:#999; cursor:pointer; }
+#tabBar .tb.active { color:#1aad19; }
+#tabBar .tb .icon { font-size:22px; display:block; }
+
+/* 页面 */
+.page { padding:16px 16px 80px; min-height:100vh; }
+
+/* 筛选 */
+.filter { display:flex; gap:8px; padding:4px 0 12px; overflow-x:auto; white-space:nowrap; }
+.filter span { padding:8px 20px; background:#fff; border-radius:20px; font-size:13px; color:#666; cursor:pointer; flex-shrink:0; }
+.filter span.on { background:#1aad19; color:#fff; }
+
+/* 卡片 */
+.card { background:#fff; border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 1px 6px rgba(0,0,0,.05); cursor:pointer; transition:all .15s; }
+.card:active { background:#fafafa; }
+.card .head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+.card .user { display:flex; align-items:center; gap:10px; }
+.card .avatar { width:44px; height:44px; border-radius:50%; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:24px; }
+.card .name { font-size:15px; font-weight:600; }
+.card .time { font-size:12px; color:#aaa; }
+.card .ctitle { font-size:16px; font-weight:bold; margin-bottom:6px; }
+.card .cbody { font-size:14px; color:#666; line-height:1.6; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:8px; }
+.card .file { font-size:12px; color:#1aad19; background:#e8f5e9; padding:6px 12px; border-radius:6px; display:inline-block; margin-bottom:8px; }
+.card .foot { display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid #f0f0f0; }
+.tag { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; margin-left:4px; }
+.tag-teacher { background:#fff3e0; color:#e65100; }
+.tag-student { background:#e8eaf6; color:#283593; }
+.tag-knowledge { background:#e3f2fd; color:#1565c0; }
+.tag-homework { background:#fce4ec; color:#c62828; }
+.tag-discussion { background:#e8f5e9; color:#2e7d32; }
+
+/* 发布页 */
+.form-group { margin-bottom:18px; }
+.form-group label { display:block; font-size:13px; color:#888; margin-bottom:6px; }
+.form-group input, .form-group textarea, .form-group select { width:100%; padding:12px 14px; background:#f5f5f5; border:none; border-radius:10px; font-size:14px; outline:none; }
+.form-group textarea { min-height:150px; resize:vertical; }
+.opts { display:flex; gap:10px; flex-wrap:wrap; }
+.opt { padding:10px 16px; border:2px solid #e0e0e0; border-radius:10px; font-size:13px; cursor:pointer; text-align:center; }
+.opt.sel { border-color:#1aad19; background:#e8f5e9; color:#1aad19; font-weight:bold; }
+.user-check { display:flex; align-items:center; gap:8px; padding:10px 0; border-bottom:1px solid #f0f0f0; font-size:14px; cursor:pointer; }
+.file-row { display:flex; align-items:center; gap:10px; }
+.file-info { font-size:13px; color:#1aad19; background:#e8f5e9; padding:8px 14px; border-radius:8px; flex:1; }
+.file-del { color:#f44336; cursor:pointer; font-size:14px; padding:4px 10px; }
+
+/* 详情 */
+.detail-title { font-size:20px; font-weight:bold; line-height:1.5; margin-bottom:14px; }
+.detail-body { font-size:15px; color:#555; line-height:1.8; margin-bottom:18px; white-space:pre-wrap; word-break:break-all; }
+.detail-file { font-size:14px; color:#1aad19; background:#e8f5e9; padding:10px 16px; border-radius:8px; margin-bottom:14px; }
+.detail-meta { font-size:13px; color:#bbb; padding-top:14px; border-top:1px solid #f0f0f0; }
+.back-btn { position:fixed; top:12px; left:16px; font-size:22px; cursor:pointer; z-index:50; background:#fff; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.15); }
+
+/* 评论区 */
+.comment-list { margin-top:16px; }
+.comment-item { display:flex; gap:12px; background:#fff; padding:14px; border-radius:12px; margin-bottom:10px; }
+.comment-item .cav { font-size:28px; width:40px; height:40px; background:#f0f0f0; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.comment-input-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:500px; display:flex; gap:10px; background:#fff; padding:12px 16px; border-top:1px solid #eee; padding-bottom:env(safe-area-inset-bottom); z-index:50; }
+.comment-input-bar input { flex:1; padding:10px 16px; background:#f5f5f5; border:none; border-radius:20px; outline:none; font-size:14px; }
+.comment-input-bar button { background:#1aad19; color:#fff; border:none; padding:10px 20px; border-radius:20px; font-size:14px; cursor:pointer; }
+
+/* 个人中心 */
+.profile-card { background:linear-gradient(135deg,#1aad19,#0d8c0d); border-radius:18px; padding:36px 20px; text-align:center; color:#fff; margin-bottom:16px; }
+.profile-card .avatar { font-size:56px; margin-bottom:8px; }
+.profile-card .name { font-size:22px; font-weight:bold; }
+.stats { display:flex; background:#fff; border-radius:14px; padding:22px; margin-bottom:16px; }
+.stats div { flex:1; text-align:center; }
+.stats .num { font-size:28px; font-weight:bold; color:#1aad19; }
+.stats .lbl { font-size:12px; color:#999; margin-top:4px; }
+.logout-btn { width:100%; padding:14px; background:#fff; color:#f44336; border:2px solid #f44336; border-radius:12px; font-size:16px; cursor:pointer; margin-top:20px; }
+.empty { text-align:center; padding:60px 0; color:#999; font-size:14px; }
+.empty .icon { font-size:48px; margin-bottom:10px; }
+
+/* 二维码 */
+.qr-box { text-align:center; margin-top:24px; padding:20px; background:#fff; border-radius:16px; }
+.qr-title { font-size:15px; font-weight:bold; color:#333; margin-bottom:14px; }
+.qr-img { width:200px; height:200px; border-radius:8px; }
+.qr-url { font-size:12px; color:#1aad19; word-break:break-all; margin-top:10px; }
+.qr-tip { font-size:11px; color:#bbb; margin-top:6px; }
+
+/* Toast */
+.toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.78); color:#fff; padding:14px 28px; border-radius:22px; font-size:14px; z-index:999; pointer-events:none; animation:fade .3s; }
+@keyframes fade { from{opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div id="toast" class="hidden"></div>
+
+<!-- ============ 登录页 ============ -->
+<div id="loginPage">
+  <div class="logo">🚗⚡</div>
+  <div class="title">电动汽车技术</div>
+  <div class="subtitle">课程交流平台</div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchLoginTab('login')">登录</div>
+    <div class="tab" onclick="switchLoginTab('register')">注册</div>
+  </div>
+  <div class="form-box">
+    <input id="loginUsername" placeholder="请输入用户名">
+    <input id="loginPassword" type="password" placeholder="请输入密码">
+    <div id="roleSelect" class="role-row hidden">
+      <div class="role-btn sel" onclick="selectRole('student')">👨‍🎓 学生</div>
+      <div class="role-btn" onclick="selectRole('teacher')">👨‍🏫 老师</div>
+    </div>
+    <button class="btn" onclick="handleLogin()" id="loginBtn">登录</button>
+  </div>
+  <div style="text-align:center;color:#aaa;font-size:12px;margin-top:16px;">首次使用请先注册账号</div>
+  <div class="qr-box">
+    <div class="qr-title">📱 扫一扫打开小程序</div>
+    <img src="/qrcode.png" class="qr-img" alt="二维码">
+    <div class="qr-url" id="shareUrl"></div>
+    <div class="qr-tip">同一WiFi下扫码即可使用</div>
+  </div>
+</div>
+
+<!-- ============ 主界面 ============ -->
+<div id="mainApp" class="hidden">
+
+  <!-- 首页 -->
+  <div id="feedPage" class="page">
+    <div class="filter" id="filterBar">
+      <span class="on" onclick="filterPosts('')">全部</span>
+      <span onclick="filterPosts('knowledge')">📖 知识点</span>
+      <span onclick="filterPosts('homework')">📝 作业</span>
+      <span onclick="filterPosts('discussion')">💬 讨论</span>
+    </div>
+    <div id="postList"></div>
+    <div id="loadMore" style="text-align:center;padding:20px;color:#aaa;font-size:13px;"></div>
+  </div>
+
+  <!-- 发布页 -->
+  <div id="publishPage" class="page hidden">
+    <div class="card">
+      <div class="form-group">
+        <label>标题 *</label>
+        <input id="pubTitle" placeholder="输入标题...">
+      </div>
+      <div class="form-group">
+        <label>类型</label>
+        <div class="opts" id="typeOpts">
+          <div class="opt sel" onclick="setType('knowledge')">📖 知识点</div>
+          <div class="opt" onclick="setType('homework')">📝 作业</div>
+          <div class="opt" onclick="setType('discussion')">💬 讨论</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>内容</label>
+        <textarea id="pubContent" placeholder="分享你的想法..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>谁可以看</label>
+        <select id="pubVis">
+          <option value="public">所有人可见</option>
+          <option value="teachers_only">仅老师可见</option>
+          <option value="students_only">仅学生可见</option>
+          <option value="specific">指定用户可见</option>
+        </select>
+      </div>
+      <div id="specUsers" class="form-group hidden"></div>
+      <div class="form-group">
+        <label>附件（选填）</label>
+        <input type="file" id="pubFile" onchange="handleFileSelect(this)" style="padding:10px; font-size:13px;">
+        <div id="pubFileInfo" class="file-info hidden" style="margin-top:8px;"></div>
+      </div>
+    </div>
+    <button class="btn" onclick="publish()">发 布</button>
+  </div>
+
+  <!-- 个人中心 -->
+  <div id="minePage" class="page hidden">
+    <div class="profile-card">
+      <div class="avatar" id="mineAvatar">👨‍🎓</div>
+      <div class="name" id="mineName"></div>
+      <div id="mineRole" style="margin-top:4px;"></div>
+    </div>
+    <div class="stats">
+      <div><div class="num" id="mineCount">0</div><div class="lbl">我的发布</div></div>
+    </div>
+    <div class="qr-box" style="margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:bold;margin-bottom:10px;">📱 邀请同学扫码加入</div>
+      <img src="/qrcode.png" style="width:180px;height:180px;border-radius:8px;" alt="二维码">
+      <div style="font-size:11px;color:#888;margin-top:6px;" id="shareUrl2"></div>
+    </div>
+    <div style="font-size:16px;font-weight:bold;margin-bottom:12px;">我的发布</div>
+    <div id="myPostList"></div>
+    <button class="logout-btn" onclick="logout()">退出登录</button>
+  </div>
+
+  <!-- 详情页 -->
+  <div id="detailPage" class="page hidden">
+    <div class="back-btn" onclick="closeDetail()">←</div>
+    <div id="detailContent"></div>
+    <div class="comment-list" id="commentList"></div>
+    <div style="height:60px;"></div>
+    <div class="comment-input-bar">
+      <input id="commentInput" placeholder="写评论..." onkeydown="if(event.key==='Enter')addComment()">
+      <button onclick="addComment()">发送</button>
+    </div>
+  </div>
+
+  <!-- TabBar -->
+  <div id="tabBar">
+    <div class="tb active" onclick="switchTab('feed')"><span class="icon">📚</span>动态</div>
+    <div class="tb" onclick="switchTab('publish')"><span class="icon">✏️</span>发布</div>
+    <div class="tb" onclick="switchTab('mine')"><span class="icon">👤</span>我的</div>
+  </div>
+</div>
+
+<script>
+// ============ 全局状态 ============
+const BASE = window.location.origin;
+let token = localStorage.getItem('token');
+let userInfo = JSON.parse(localStorage.getItem('userInfo') || 'null');
+let currentTab = 'feed';
+let currentType = '';
+let currentPage = 1;
+let hasMore = true;
+let loginMode = 'login';
+let loginRole = 'student';
+let pubType = 'knowledge';
+let pubFileUrl = '';
+let pubFileName = '';
+let visibleUsers = [];
+let currentDetailId = null;
+
+// ============ 工具函数 ============
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 1800);
+}
+
+function fmtTime(s) {
+  if (!s) return '';
+  const d = new Date(s.replace(/-/g,'/'));
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 6e4) return '刚刚';
+  if (diff < 36e5) return Math.floor(diff/6e4)+'分钟前';
+  if (diff < 864e5) return Math.floor(diff/36e5)+'小时前';
+  if (diff < 1728e5) return '昨天';
+  return (d.getMonth()+1)+'月'+d.getDate()+'日';
+}
+
+function typeLabel(t) { return {knowledge:'知识点',homework:'作业',discussion:'讨论'}[t]||t; }
+function roleLabel(r) { return {teacher:'老师',student:'学生'}[r]||r; }
+function visLabel(v) { return {public:'所有人可见',teachers_only:'仅老师可见',students_only:'仅学生可见',specific:'指定用户可见'}[v]||v; }
+
+async function api(url, opts={}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(BASE + url, { headers, ...opts });
+  if (res.status === 401) { logout(); return null; }
+  return res.json();
+}
+
+// ============ 登录 ============
+function switchLoginTab(mode) {
+  loginMode = mode;
+  document.querySelectorAll('#loginPage .tab').forEach((t,i) => t.classList.toggle('active', (i===0 && mode==='login')||(i===1 && mode==='register')));
+  document.getElementById('roleSelect').classList.toggle('hidden', mode==='login');
+  document.getElementById('loginBtn').textContent = mode==='login' ? '登录' : '注册';
+}
+
+function selectRole(r) {
+  loginRole = r;
+  document.querySelectorAll('#roleSelect .role-btn').forEach(b => b.classList.toggle('sel', b.textContent.includes(r==='student'?'学生':'老师')));
+}
+
+async function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!username || !password) return toast('请输入用户名和密码');
+  const url = loginMode==='login' ? '/api/auth/login' : '/api/auth/register';
+  const body = loginMode==='login' ? {username,password} : {username,password,role:loginRole};
+  const res = await api(url, { method:'POST', body:JSON.stringify(body) });
+  if (!res) return;
+  if (res.code !== 0) return toast(res.msg);
+  token = res.data.token;
+  userInfo = res.data.user;
+  localStorage.setItem('token', token);
+  localStorage.setItem('userInfo', JSON.stringify(userInfo));
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('mineAvatar').textContent = userInfo.role==='teacher'?'👨‍🏫':'👨‍🎓';
+  document.getElementById('mineName').textContent = userInfo.username;
+  document.getElementById('mineRole').innerHTML = `<span class="tag tag-${userInfo.role}">${roleLabel(userInfo.role)}</span>`;
+  toast(loginMode==='login'?'登录成功':'注册成功');
+  switchTab('feed');
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userInfo');
+  token = null; userInfo = null;
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('mainApp').classList.add('hidden');
+}
+
+// ============ Tab切换 ============
+function switchTab(tab) {
+  currentTab = tab;
+  ['feedPage','publishPage','minePage','detailPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  if (tab === 'feed') { document.getElementById('feedPage').classList.remove('hidden'); loadFeed(true); }
+  else if (tab === 'publish') { document.getElementById('publishPage').classList.remove('hidden'); loadUsersForPublish(); }
+  else if (tab === 'mine') { document.getElementById('minePage').classList.remove('hidden'); loadMine(); }
+  document.querySelectorAll('#tabBar .tb').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='feed')||(i===1&&tab==='publish')||(i===2&&tab==='mine')));
+}
+
+// ============ 首页 ============
+async function loadFeed(reset=false) {
+  if (reset) { currentPage = 1; hasMore = true; document.getElementById('postList').innerHTML = ''; }
+  if (!hasMore) return;
+  let url = `/api/posts?page=${currentPage}&pageSize=20`;
+  if (currentType) url += '&type=' + currentType;
+  const res = await api(url);
+  if (!res || res.code !== 0) return;
+  const list = res.data.list;
+  const container = document.getElementById('postList');
+  list.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.onclick = () => openDetail(p.id);
+    div.innerHTML = `
+      <div class="head">
+        <div class="user">
+          <div class="avatar">${p.role==='teacher'?'👨‍🏫':'👨‍🎓'}</div>
+          <div>
+            <div class="name">${p.username} <span class="tag tag-${p.role}">${roleLabel(p.role)}</span></div>
+            <div class="time">${fmtTime(p.created_at)}</div>
+          </div>
+        </div>
+        <span class="tag tag-${p.type}">${typeLabel(p.type)}</span>
+      </div>
+      <div class="ctitle">${p.title}</div>
+      ${p.content ? `<div class="cbody">${p.content}</div>` : ''}
+      ${p.file_name ? `<div class="file">📎 ${p.file_name}</div>` : ''}
+      <div class="foot">
+        <span style="font-size:12px;color:#bbb;">🔒 ${visLabel(p.visibility)}</span>
+        ${p.user_id === userInfo.id ? `<span style="font-size:14px;cursor:pointer;padding:4px;" onclick="event.stopPropagation();delPost(${p.id})">🗑️</span>` : ''}
+      </div>`;
+    container.appendChild(div);
+  });
+  document.getElementById('loadMore').textContent = list.length < 20 ? '没有更多了' : '上拉加载更多';
+  hasMore = list.length >= 20;
+  currentPage++;
+}
+
+function filterPosts(type) {
+  currentType = type;
+  document.querySelectorAll('#filterBar span').forEach(s => s.classList.toggle('on', s.textContent.includes(type||'全部')));
+  loadFeed(true);
+}
+
+async function delPost(id) {
+  if (!confirm('确定删除？')) return;
+  const res = await api('/api/posts/'+id, { method:'DELETE' });
+  if (res && res.code === 0) { toast('已删除'); loadFeed(true); }
+  else toast(res?.msg||'删除失败');
+}
+
+window.addEventListener('scroll', () => {
+  if (currentTab !== 'feed') return;
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+    loadFeed();
+  }
+});
+
+// ============ 发布 ============
+function setType(t) {
+  pubType = t;
+  document.querySelectorAll('#typeOpts .opt').forEach(o => o.classList.toggle('sel', o.textContent.includes({knowledge:'知识点',homework:'作业',discussion:'讨论'}[t])));
+}
+
+document.getElementById('pubVis').addEventListener('change', function() {
+  document.getElementById('specUsers').classList.toggle('hidden', this.value !== 'specific');
+});
+
+async function loadUsersForPublish() {
+  const res = await api('/api/auth/users');
+  if (!res || res.code !== 0) return;
+  const users = res.data.filter(u => u.id !== userInfo.id);
+  const container = document.getElementById('specUsers');
+  container.innerHTML = '<label>选择可见用户</label>' + users.map(u =>
+    `<div class="user-check" onclick="toggleVisUser(${u.id},this)"><input type="checkbox"> ${u.username} (${roleLabel(u.role)})</div>`
+  ).join('');
+}
+
+function toggleVisUser(uid, el) {
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+  if (cb.checked) visibleUsers.push(uid);
+  else visibleUsers = visibleUsers.filter(id => id !== uid);
+}
+
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('file', file);
+  fetch(BASE+'/api/upload', { method:'POST', headers:{'Authorization':'Bearer '+token}, body:form })
+    .then(r => r.json())
+    .then(res => {
+      if (res.code === 0) {
+        pubFileUrl = res.data.url;
+        pubFileName = res.data.name;
+        document.getElementById('pubFileInfo').classList.remove('hidden');
+        document.getElementById('pubFileInfo').innerHTML = `📎 ${pubFileName} <span class="file-del" onclick="clearFile()">✕</span>`;
+        toast('上传成功');
+      } else toast('上传失败');
+    })
+    .catch(() => toast('上传失败'));
+}
+
+function clearFile() {
+  pubFileUrl = ''; pubFileName = '';
+  document.getElementById('pubFile').value = '';
+  document.getElementById('pubFileInfo').classList.add('hidden');
+}
+
+async function publish() {
+  const title = document.getElementById('pubTitle').value.trim();
+  const content = document.getElementById('pubContent').value.trim();
+  const visibility = document.getElementById('pubVis').value;
+  if (!title) return toast('请输入标题');
+  if (visibility === 'specific' && visibleUsers.length === 0) return toast('请选择可见用户');
+  const body = { title, content, type:pubType, visibility, file_url:pubFileUrl, file_name:pubFileName, visibleUsers };
+  const res = await api('/api/posts', { method:'POST', body:JSON.stringify(body) });
+  if (!res) return;
+  if (res.code === 0) {
+    toast('发布成功');
+    document.getElementById('pubTitle').value = '';
+    document.getElementById('pubContent').value = '';
+    clearFile();
+    visibleUsers = [];
+    setTimeout(() => switchTab('feed'), 600);
+  } else toast(res.msg);
+}
+
+// ============ 详情 ============
+async function openDetail(id) {
+  currentDetailId = id;
+  const res = await api('/api/posts/'+id);
+  if (!res) return;
+  if (res.code !== 0) return toast(res.msg);
+  const p = res.data;
+  document.getElementById('detailContent').innerHTML = `
+    <div class="card">
+      <div class="head">
+        <div class="user">
+          <div class="avatar">${p.role==='teacher'?'👨‍🏫':'👨‍🎓'}</div>
+          <div>
+            <div class="name">${p.username} <span class="tag tag-${p.role}">${roleLabel(p.role)}</span> <span class="tag tag-${p.type}">${typeLabel(p.type)}</span></div>
+            <div class="time">${fmtTime(p.created_at)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail-title">${p.title}</div>
+      ${p.content ? `<div class="detail-body">${p.content}</div>` : ''}
+      ${p.file_name ? `<div class="detail-file">📎 ${p.file_name}</div>` : ''}
+      <div class="detail-meta">🔒 ${visLabel(p.visibility)}</div>
+    </div>`;
+  document.getElementById('feedPage').classList.add('hidden');
+  document.getElementById('publishPage').classList.add('hidden');
+  document.getElementById('minePage').classList.add('hidden');
+  document.getElementById('detailPage').classList.remove('hidden');
+  document.getElementById('commentInput').value = '';
+  loadComments();
+  window.scrollTo(0,0);
+}
+
+function closeDetail() {
+  document.getElementById('detailPage').classList.add('hidden');
+  document.getElementById('tabBar').style.display = 'flex';
+  switchTab(currentTab);
+}
+
+async function loadComments() {
+  const res = await api('/api/comments/'+currentDetailId);
+  if (!res || res.code !== 0) return;
+  document.getElementById('commentList').innerHTML = '<div style="font-size:15px;font-weight:bold;margin-bottom:10px;">评论 ('+res.data.length+')</div>' +
+    res.data.map(c => `
+      <div class="comment-item">
+        <div class="cav">${c.role==='teacher'?'👨‍🏫':'👨‍🎓'}</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;">${c.username} <span class="tag tag-${c.role}">${roleLabel(c.role)}</span></div>
+          <div style="font-size:14px;color:#555;margin:4px 0;">${c.content}</div>
+          <div style="font-size:12px;color:#bbb;">${fmtTime(c.created_at)}</div>
+        </div>
+      </div>`).join('');
+}
+
+async function addComment() {
+  const content = document.getElementById('commentInput').value.trim();
+  if (!content) return toast('请输入评论');
+  const res = await api('/api/comments', { method:'POST', body:JSON.stringify({post_id:currentDetailId,content}) });
+  if (!res) return;
+  if (res.code === 0) {
+    document.getElementById('commentInput').value = '';
+    loadComments();
+  } else toast(res.msg);
+}
+
+// ============ 我的 ============
+async function loadMine() {
+  if (!userInfo) return;
+  document.getElementById('mineAvatar').textContent = userInfo.role==='teacher'?'👨‍🏫':'👨‍🎓';
+  document.getElementById('mineName').textContent = userInfo.username;
+  document.getElementById('mineRole').innerHTML = `<span class="tag tag-${userInfo.role}">${roleLabel(userInfo.role)}</span>`;
+  const res = await api('/api/posts?pageSize=100');
+  if (!res || res.code !== 0) return;
+  const mine = res.data.list.filter(p => p.user_id === userInfo.id);
+  document.getElementById('mineCount').textContent = mine.length;
+  const container = document.getElementById('myPostList');
+  container.innerHTML = mine.length === 0
+    ? '<div class="empty"><div class="icon">📭</div>暂无发布</div>'
+    : mine.map(p => `
+      <div class="card" onclick="openDetail(${p.id})">
+        <div class="ctitle">${p.title}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <span class="tag tag-${p.type}">${typeLabel(p.type)}</span>
+          <span style="font-size:12px;color:#bbb;">${fmtTime(p.created_at)}</span>
+        </div>
+      </div>`).join('');
+}
+
+// ============ 初始化 ============
+document.getElementById('shareUrl').textContent = window.location.href;
+document.getElementById('shareUrl2').textContent = window.location.href;
+if (token && userInfo) {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('mineAvatar').textContent = userInfo.role==='teacher'?'👨‍🏫':'👨‍🎓';
+  document.getElementById('mineName').textContent = userInfo.username;
+  document.getElementById('mineRole').innerHTML = `<span class="tag tag-${userInfo.role}">${roleLabel(userInfo.role)}</span>`;
+  switchTab('feed');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<view class="container">
+  <!-- 个人信息卡片 -->
+  <view class="profile-card">
+    <view class="profile-avatar">{{userInfo.role === 'teacher' ? '👨‍🏫' : '👨‍🎓'}}</view>
+    <view class="profile-name">{{userInfo.username}}</view>
+    <view class="profile-role">
+      <text class="tag tag-{{userInfo.role}}">{{userInfo.role === 'teacher' ? '老师' : '学生'}}</text>
+    </view>
+    <view class="profile-id">ID: {{userInfo.id}}</view>
+  </view>
+
+  <!-- 统计 -->
+  <view class="stats-row">
+    <view class="stat-item">
+      <view class="stat-num">{{myPosts.length}}</view>
+      <view class="stat-label">我的发布</view>
+    </view>
+  </view>
+
+  <!-- 我的发布 -->
+  <view class="section">
+    <view class="section-title">我的发布</view>
+    <view wx:if="{{myPosts.length > 0}}">
+      <view class="card my-post-item" wx:for="{{myPosts}}" wx:key="id"
+            bindtap="goDetail" data-id="{{item.id}}">
+        <view class="my-post-title">{{item.title}}</view>
+        <view class="my-post-meta">
+          <text class="tag tag-{{item.type}}">{{util.typeLabel(item.type)}}</text>
+          <text class="my-post-time">{{util.formatTime(item.created_at)}}</text>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty" style="padding:40rpx 0;">
+      <view>暂无发布</view>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <button class="logout-btn" bindtap="logout">退出登录</button>
+</view>

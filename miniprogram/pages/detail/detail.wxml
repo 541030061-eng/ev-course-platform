@@ -1,0 +1,61 @@
+<view class="container">
+  <view wx:if="{{post}}" class="card">
+    <!-- 帖子头部 -->
+    <view class="detail-header">
+      <view class="post-user">
+        <view class="avatar">{{post.role === 'teacher' ? '👨‍🏫' : '👨‍🎓'}}</view>
+        <view class="user-info">
+          <view class="user-name">
+            {{post.username}}
+            <text class="tag tag-{{post.role}}">{{post.role === 'teacher' ? '老师' : '学生'}}</text>
+            <text class="tag tag-{{post.type}}">{{util.typeLabel(post.type)}}</text>
+          </view>
+          <view class="post-time">{{util.formatTime(post.created_at)}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标题和内容 -->
+    <view class="detail-title">{{post.title}}</view>
+    <view wx:if="{{post.content}}" class="detail-content">{{post.content}}</view>
+
+    <!-- 附件 -->
+    <view wx:if="{{post.file_name}}" class="detail-file">
+      📎 {{post.file_name}}
+    </view>
+
+    <!-- 可见性 -->
+    <view class="detail-visibility">🔒 {{util.visibilityLabel(post.visibility)}}</view>
+  </view>
+
+  <!-- 评论区 -->
+  <view class="comment-section">
+    <view class="comment-title">评论 ({{comments.length}})</view>
+
+    <view wx:if="{{comments.length > 0}}">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+        <view class="comment-avatar">{{item.role === 'teacher' ? '👨‍🏫' : '👨‍🎓'}}</view>
+        <view class="comment-body">
+          <view class="comment-user">
+            {{item.username}}
+            <text class="tag tag-{{item.role}}" style="font-size:20rpx;">{{item.role === 'teacher' ? '老师' : '学生'}}</text>
+          </view>
+          <view class="comment-text">{{item.content}}</view>
+          <view class="comment-time">{{util.formatTime(item.created_at)}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{comments.length === 0}}" class="empty" style="padding:40rpx 0;">
+      <view>暂无评论</view>
+    </view>
+  </view>
+
+  <!-- 发表评论 -->
+  <view class="comment-input-bar">
+    <input class="comment-input" placeholder="写评论..."
+           value="{{commentText}}" bindinput="onCommentInput"
+           confirm-type="send" bindconfirm="addComment" />
+    <button class="send-btn" bindtap="addComment" size="mini">发送</button>
+  </view>
+</view>

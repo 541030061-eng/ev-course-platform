@@ -1,0 +1,41 @@
+<view class="login-container">
+  <view class="login-header">
+    <view class="logo">🚗⚡</view>
+    <view class="title">电动汽车技术</view>
+    <view class="subtitle">课程交流平台</view>
+  </view>
+
+  <view class="tab-switch">
+    <view class="tab {{activeTab==='login'?'active':''}}" bindtap="switchTab" data-tab="login">登录</view>
+    <view class="tab {{activeTab==='register'?'active':''}}" bindtap="switchTab" data-tab="register">注册</view>
+  </view>
+
+  <view class="form">
+    <view class="form-item">
+      <input class="input" placeholder="请输入用户名" value="{{username}}" bindinput="onUsernameInput" />
+    </view>
+    <view class="form-item">
+      <input class="input" placeholder="请输入密码" password value="{{password}}" bindinput="onPasswordInput" />
+    </view>
+
+    <view wx:if="{{activeTab==='register'}}" class="role-select">
+      <view class="role-label">选择身份：</view>
+      <view class="role-options">
+        <view class="role-btn {{role==='teacher'?'active':''}}" bindtap="selectRole" data-role="teacher">
+          👨‍🏫 老师
+        </view>
+        <view class="role-btn {{role==='student'?'active':''}}" bindtap="selectRole" data-role="student">
+          👨‍🎓 学生
+        </view>
+      </view>
+    </view>
+
+    <button class="submit-btn" bindtap="handleSubmit" loading="{{loading}}">
+      {{activeTab==='login' ? '登录' : '注册'}}
+    </button>
+  </view>
+
+  <view class="tips">
+    首次使用请先注册账号
+  </view>
+</view>
