@@ -2,7 +2,7 @@ App({
   globalData: {
     userInfo: null,
     token: '',
-    baseUrl: 'http://localhost:3000',
+    baseUrl: 'https://ev-course.onrender.com',
     isLoggedIn: false
   },
 
